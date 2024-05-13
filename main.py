@@ -1,6 +1,6 @@
 import pygame
 from globals import *
-from judgement import Judgement
+from judge import Judge
 from lane import Lane
 from note import Note
 
@@ -20,10 +20,10 @@ lanes: list[Lane] = [Lane(i) for i in range(LANES)]
 BPM = 120
 OFFSET = 56
 
-judgement = Judgement()
+judge = Judge()
 
 # pool 8 notes for testing
-notes.add(*[Note(OFFSET + i * (60000 // BPM), i % LANES, judgement) for i in range(8)])
+notes.add(*[Note(OFFSET + i * (60000 // BPM), i % LANES, judge) for i in range(8)])
 
 # sort notes into lanes
 for note in notes:
