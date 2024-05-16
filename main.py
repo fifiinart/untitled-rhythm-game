@@ -17,10 +17,20 @@ clock = pygame.time.Clock()
 notes: pygame.sprite.Group = pygame.sprite.Group()
 lanes: list[Lane] = [Lane(i) for i in range(LANES)]
 
+
+def change_accuracy(judge: Judge, _):
+    print(judge.accuracy)
+
+def change_combo(judge: Judge, _):
+    print(judge.combo)
+
+
 BPM = 120
 OFFSET = 56
 
 judge = Judge()
+
+judge.on_judge_event += [change_accuracy, change_combo]
 
 # pool 8 notes for testing
 notes.add(*[Note(OFFSET + i * (60000 // BPM), i % LANES, judge) for i in range(8)])
@@ -28,7 +38,6 @@ notes.add(*[Note(OFFSET + i * (60000 // BPM), i % LANES, judge) for i in range(8
 # sort notes into lanes
 for note in notes:
     lanes[note.lane].add(note)
-
 
 hits = []
 wait_timer = 2000

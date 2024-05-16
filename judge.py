@@ -26,6 +26,8 @@ class Judge:
         Judge.MISS: 0
     }
 
+    on_judge_event = []
+
     def __init__(self):
         self.hits = {e: 0 for e in Judge.Judge}
         self.judgements = 0
@@ -33,28 +35,24 @@ class Judge:
         self.combo = 0
         self.accuracy = 100.0
 
-    def miss(self):
-        self.hits[Judge.Judge.MISS] += 1
-        self.judgements += 1
-
-        self.update_accuracy(Judge.Judge.MISS)
-        self.combo = 0
-
-    def update_accuracy(self, judgement):
+    def update_accuracy(self, judgement: Judge):
         self.accuracy = (self.accuracy * (self.judgements - 1) + self.judge_accuracy[judgement]) / self.judgements
-        print(self.accuracy)
+
+    def on_judge(self, judgement: Judge):
+        self.hits[judgement] += 1
+        if judgement == Judge.Judge.MISS:
+            self.combo = 0
+        else:
+            self.combo += 1
+        self.judgements += 1
+        self.update_accuracy(judgement)
+
+        [e(self, judgement) for e in self.on_judge_event]
 
     def judge(self, diff_timing: int):
         if diff_timing > self.timings[Judge.Judge.MISS]:  # too far away to judge
             return False
         for judgement, window in self.timings.items():
             if abs(diff_timing) <= window:
-                self.hits[judgement] += 1
-                if judgement == Judge.Judge.MISS:
-                    self.combo = 0
-                else:
-                    self.combo += 1
-                self.judgements += 1
-
-                self.update_accuracy(judgement)
+                self.on_judge(judgement)
                 return True

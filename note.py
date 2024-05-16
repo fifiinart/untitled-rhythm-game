@@ -24,7 +24,7 @@ class Note(pygame.sprite.Sprite):
         self.rect.y = (timing - self.timing) * NOTE_SPEED + (JUDGEMENT_LINE_POS - self.rect.height)
 
         if timing - self.timing > self._judge.timings[Judge.Judge.MISS]:
-            self._judge.miss()
+            self._judge.on_judge(Judge.Judge.MISS)
             self.kill()
 
     def judge(self, timing: int):
