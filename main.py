@@ -31,18 +31,24 @@ for note in notes:
 
 
 hits = []
-
+wait_timer = 2000
 pygame.mixer_music.load("beat.mp3")
-pygame.mixer_music.play()
 
 # Game loop
 running = True
 
-while running and pygame.mixer_music.get_busy():
+while running and (wait_timer > 0 or pygame.mixer_music.get_busy()):
     # 1 Process input/events
     clock.tick(FPS)  # will make the loop run at the same speed all the time
 
-    timing = pygame.mixer_music.get_pos()
+    if wait_timer > 0:
+        wait_timer -= clock.get_time()
+        timing = -wait_timer
+        if wait_timer <= 0:
+            pygame.mixer_music.play()
+
+    if wait_timer <= 0:
+        timing = pygame.mixer_music.get_pos()
 
     for event in pygame.event.get():  # gets all the events which have occurred till now and keeps tab of them.
         # listening for the X button at the top

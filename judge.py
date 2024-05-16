@@ -36,13 +36,19 @@ class Judge:
     def miss(self):
         self.hits[Judge.Judge.MISS] += 1
         self.judgements += 1
+
+        self.update_accuracy(Judge.Judge.MISS)
         self.combo = 0
 
+    def update_accuracy(self, judgement):
+        self.accuracy = (self.accuracy * (self.judgements - 1) + self.judge_accuracy[judgement]) / self.judgements
+        print(self.accuracy)
+
     def judge(self, diff_timing: int):
-        if diff_timing > self.timings[Judge.Judge.MISS]:
+        if diff_timing > self.timings[Judge.Judge.MISS]:  # too far away to judge
             return False
         for judgement, window in self.timings.items():
-            if abs(diff_timing) < window:
+            if abs(diff_timing) <= window:
                 self.hits[judgement] += 1
                 if judgement == Judge.Judge.MISS:
                     self.combo = 0
@@ -50,6 +56,5 @@ class Judge:
                     self.combo += 1
                 self.judgements += 1
 
-                self.accuracy = (self.accuracy * self.judgements - 1 + self.judge_accuracy[judgement]) / self.judgements
-                print(self.accuracy)  # todo: fix accuracy
-                return True  # don't judge for worse judgements
+                self.update_accuracy(judgement)
+                return True
