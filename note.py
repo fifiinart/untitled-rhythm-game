@@ -4,14 +4,12 @@ from judge import Judge
 
 
 class Note(pygame.sprite.Sprite):
-    HEIGHT = 15
-    COLOR = (15, 50, 255)
 
     def __init__(self, timing: int, lane: int, judge: Judge):
         pygame.sprite.Sprite.__init__(self)
 
-        self.image = pygame.Surface((WIDTH // LANES, Note.HEIGHT))
-        self.image.fill(Note.COLOR)
+        self.image = pygame.Surface((WIDTH // LANES, NOTE_HEIGHT))
+        self.image.fill(NOTE_COLOR)
 
         self.rect = self.image.get_rect()
         self.timing = timing

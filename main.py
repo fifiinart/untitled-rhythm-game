@@ -3,6 +3,7 @@ from globals import *
 from judge import Judge
 from lane import Lane
 from note import Note
+from graphics import Graphics
 
 judgement_line = pygame.Rect(0, JUDGEMENT_LINE_POS, WIDTH, LINE_WIDTH)
 lane_separators = [pygame.Rect(WIDTH // LANES * i - (LINE_WIDTH / 2), 0, LINE_WIDTH, HEIGHT) for i in range(1, LANES)]
@@ -17,12 +18,10 @@ clock = pygame.time.Clock()
 notes: pygame.sprite.Group = pygame.sprite.Group()
 lanes: list[Lane] = [Lane(i) for i in range(LANES)]
 
+graphics = Graphics(notes)
 
 def change_accuracy(judge: Judge, _):
     print(judge.accuracy)
-
-def change_combo(judge: Judge, _):
-    print(judge.combo)
 
 
 BPM = 120
@@ -30,7 +29,7 @@ OFFSET = 56
 
 judge = Judge()
 
-judge.on_judge_event += [change_accuracy, change_combo]
+judge.on_judge_event += [graphics.render_accuracy, graphics.render_combo]
 
 # pool 8 notes for testing
 notes.add(*[Note(OFFSET + i * (60000 // BPM), i % LANES, judge) for i in range(8)])
@@ -74,12 +73,6 @@ while running and (wait_timer > 0 or pygame.mixer_music.get_busy()):
     # 2 Update
     notes.update(timing)
 
-    screen.fill((0, 0, 0))
-
-    [pygame.draw.rect(screen, LANE_SEP_COL, sep) for sep in lane_separators]
-    pygame.draw.rect(screen, JUDGEMENT_LINE_COL, judgement_line)
-    notes.draw(screen)
-
-    pygame.display.flip()
+    graphics.draw(screen)
 
 pygame.quit()
