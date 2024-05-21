@@ -1,3 +1,5 @@
+import re
+
 import pygame
 from globals import *
 from judge import Judge
@@ -20,10 +22,6 @@ lanes: list[Lane] = [Lane(i) for i in range(LANES)]
 
 graphics = Graphics(notes)
 
-def change_accuracy(judge: Judge, _):
-    print(judge.accuracy)
-
-
 BPM = 120
 OFFSET = 56
 
@@ -33,6 +31,17 @@ judge.on_judge_event += [graphics.render_accuracy, graphics.render_combo]
 
 # pool 8 notes for testing
 notes.add(*[Note(OFFSET + i * (60000 // BPM), i % LANES, judge) for i in range(8)])
+
+with open("beat.osu", "r") as f:
+    state = None
+    for line in f:
+        if not re.match(r"^\s*$", line):  # just whitespace
+            if m := re.match(r"\[(.+)]", line):  # new [Header]
+                state = m.group(1)
+            elif state == "General":
+                print(re.match(r"(.+):\s*(.+)", line).groups())  # $key: $value format
+
+
 
 # sort notes into lanes
 for note in notes:
