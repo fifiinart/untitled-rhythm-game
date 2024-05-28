@@ -13,8 +13,33 @@ lane_separators = [pygame.Rect(WIDTH // LANES * i - (LINE_WIDTH / 2), 0, LINE_WI
 pygame.init()
 pygame.mixer.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Untitled Rhythm Game")
 clock = pygame.time.Clock()
+
+
+
+beatmap = {
+    "general": {},
+    "metadata": {},
+    "hit-objects": []
+}
+with open("beat.osu", "r") as f:
+    state = None
+    for line in f:
+        if not re.match(r"^\s*$", line):  # just whitespace
+            if m := re.match(r"\[(.+)]", line):  # new [Header]
+                state = m.group(1)
+            elif state == "General":
+                k, v = re.match(r"(.+):\s*(.+)", line).groups()  # $key: $value format
+                beatmap["general"][k] = v
+            elif state == "Metadata":
+                k, v = re.match(r"(.+):\s*(.+)", line).groups()  # $key: $value format
+                beatmap["metadata"][k] = v
+            elif state == "HitObjects":
+                x, time, type, end_time = re.match(r"^(\d+),\d+,(\d+),(\d+),\d+,(\d+)", line).groups()
+                beatmap["hit-objects"].append((int(x), int(time), int(type), int(end_time)))
+
+
+pygame.display.set_caption(beatmap["metadata"]["Title"] + " - " + beatmap["metadata"]["Artist"])
 
 # group all the sprites together for ease of update
 notes: pygame.sprite.Group = pygame.sprite.Group()
@@ -29,23 +54,13 @@ judge = Judge()
 
 judge.on_judge_event += [graphics.render_accuracy, graphics.render_combo]
 
-# pool 8 notes for testing
-notes.add(*[Note(OFFSET + i * (60000 // BPM), i % LANES, judge) for i in range(8)])
-
-with open("beat.osu", "r") as f:
-    state = None
-    for line in f:
-        if not re.match(r"^\s*$", line):  # just whitespace
-            if m := re.match(r"\[(.+)]", line):  # new [Header]
-                state = m.group(1)
-            elif state == "General":
-                print(re.match(r"(.+):\s*(.+)", line).groups())  # $key: $value format
-
-
-
-# sort notes into lanes
-for note in notes:
-    lanes[note.lane].add(note)
+for x, time, type, end_time in beatmap["hit-objects"]:
+    note = Note(time, x * 4 // 512, judge)
+    notes.add(note)
+    lanes[x * 4 // 512].add(note)
+# # sort notes into lanes
+# for note in notes:
+#     lanes[note.lane].add(note)
 
 hits = []
 wait_timer = 2000
