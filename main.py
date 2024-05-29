@@ -4,7 +4,7 @@ import pygame
 from globals import *
 from judge import Judge
 from lane import Lane
-from note import Note
+from note import Note, Hold
 from graphics import Graphics
 
 judgement_line = pygame.Rect(0, JUDGEMENT_LINE_POS, WIDTH, LINE_WIDTH)
@@ -55,7 +55,11 @@ judge = Judge()
 judge.on_judge_event += [graphics.render_accuracy, graphics.render_combo]
 
 for x, time, type, end_time in beatmap["hit-objects"]:
-    note = Note(time, x * 4 // 512, judge)
+    if type == 3:
+        note = Hold(time, x * 4 // 512, end_time, judge)
+    else:
+        # note = Note(time, x * 4 // 512, judge)
+        note = Hold(time, x * 4 // 512, time + 200, judge)
     notes.add(note)
     lanes[x * 4 // 512].add(note)
 # # sort notes into lanes
