@@ -53,15 +53,21 @@ OFFSET = 56
 judge = Judge()
 
 judge.on_judge_event += [graphics.render_accuracy, graphics.render_combo]
+#
+# for x, time, type, end_time in beatmap["hit-objects"]:
+#     if type == 3:
+#         note = Hold(time, x * 4 // 512, end_time, judge)
+#     else:
+#         note = Note(time, x * 4 // 512, judge)
+#     notes.add(note)
+#     lanes[x * 4 // 512].add(note)
 
-for x, time, type, end_time in beatmap["hit-objects"]:
-    if type == 3:
-        note = Hold(time, x * 4 // 512, end_time, judge)
-    else:
-        # note = Note(time, x * 4 // 512, judge)
-        note = Hold(time, x * 4 // 512, time + 200, judge)
+for i in range(8):
+    note = Hold(i * 1000, i % 4, i * 1000 + 500, judge)
     notes.add(note)
-    lanes[x * 4 // 512].add(note)
+    lanes[i % 4].add(note)
+
+
 # # sort notes into lanes
 # for note in notes:
 #     lanes[note.lane].add(note)
