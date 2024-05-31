@@ -38,7 +38,8 @@ class Hold(pygame.sprite.Sprite):
     def __init__(self, timing: int, lane: int, end_timing: int, judge: Judge):
         super().__init__()
 
-        self.image = pygame.Surface((0, 0))
+        self.image = pygame.Surface((WIDTH // LANES, HEIGHT), pygame.SRCALPHA)
+        self.image.fill((0, 0, 0, 0))
         self.rect = self.image.get_rect()
 
         self.start_image = pygame.Surface((WIDTH // LANES, NOTE_HEIGHT))
@@ -82,23 +83,21 @@ class Hold(pygame.sprite.Sprite):
                 self._judge.on_judge(Judge.Judge.MISS)
                 self.kill()
 
-        self.image = pygame.Surface((WIDTH // LANES, abs(self.end_rect.y - self.start_rect.y) + NOTE_HEIGHT))
-        self.rect = self.image.get_rect()
-        self.rect.bottomleft = (0, self.start_rect.bottom)
-        self.hold_rect.midbottom = self.rect.centerx, self.rect.bottom
+        self.image.fill((255, 255, 255, 0))
+        self.rect.x = self.start_rect.x
+        self.hold_rect.midbottom = self.rect.centerx, self.start_rect.bottom
         pygame.draw.rect(self.image, NOTE_COLOR, self.hold_rect)
         self.image.blits([
-            (self.end_image, self.rect.topleft),
-            (self.start_image, (self.rect.left, self.rect.bottom + NOTE_HEIGHT))
+            (self.end_image, (0, self.end_rect.y)),
+            (self.start_image, (0, self.start_rect.y))
         ])
-        self.rect.left = self.start_rect.left
-
 
     def judge(self, timing: int):
         if not self.is_held:
             if self._judge.judge(timing - self.start_timing):
                 self.is_held = True
         else:
+            print("keyup")
             if self._judge.judge(timing - self.end_timing):
                 self.is_held = False
                 self.kill()

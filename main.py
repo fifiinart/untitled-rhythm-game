@@ -97,12 +97,12 @@ while running and (wait_timer > 0 or pygame.mixer_music.get_busy()):
         if event.type == pygame.QUIT:
             running = False
 
-        if event.type == pygame.KEYDOWN:
+        if event.type in [pygame.KEYDOWN, pygame.KEYUP]:
             try:
                 index = LANE_KEYS.index(event.key)
-                lanes[index].judge(timing)
+                lanes[index].judge(timing, event.type)
             except ValueError:
-                print("invalid key " + str(event.key))
+                pass
 
     # 2 Update
     notes.update(timing)
