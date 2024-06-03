@@ -44,8 +44,8 @@ class Hold(pygame.sprite.Sprite):
 
         self.start_image = pygame.Surface((WIDTH // LANES, NOTE_HEIGHT))
         self.start_image.fill(NOTE_COLOR)
+        self.start_rect = self.start_image.get_rect()
 
-        self.start_rect = self.image.get_rect()
         self.start_timing = timing
         self.lane = lane
 
@@ -64,13 +64,16 @@ class Hold(pygame.sprite.Sprite):
         self.is_held = False
 
     def update(self, timing: int) -> None:
-        self.end_rect.x, self.end_rect.y = calculate_pos(timing, self.end_timing, self.end_rect, self.lane)
-        self.start_rect.x, self.start_rect.y = calculate_pos(timing, timing if self.is_held else self.start_timing,
+        self.rect.x, self.end_rect.y = calculate_pos(timing, self.end_timing, self.end_rect, self.lane)
+        _, self.start_rect.y = calculate_pos(timing, timing if self.is_held else self.start_timing,
                                                              self.start_rect,
                                                              self.lane)
-        height_difference = pygame.math.clamp(self.start_rect.y - self.end_rect.y, 0, float('inf'))
-        if self.hold_rect.h != height_difference:
-            self.hold_rect.h = height_difference
+
+        height_difference = min(self.start_rect.y, HEIGHT) - max(self.end_rect.y, 0)
+        if self.hold_rect.h != abs(height_difference):
+            self.hold_rect.h = abs(height_difference)
+
+            self.hold_image = pygame.Surface(self.hold_rect.size)
             self.hold_image.fill((255, 255, 255))
 
         if not self.is_held:
@@ -84,13 +87,24 @@ class Hold(pygame.sprite.Sprite):
                 self.kill()
 
         self.image.fill((255, 255, 255, 0))
-        self.rect.x = self.start_rect.x
-        self.hold_rect.midbottom = self.rect.centerx, self.start_rect.bottom
+        self.hold_rect.topleft = (WIDTH // LANES // 2 - self.hold_rect.w // 2,
+                                  self.end_rect.centery if height_difference > 0
+                                  else self.start_rect.centery)
+
+        # if self.end_rect.bottom >= 0 and self.end_rect.top <= 600:
+        #     self.image.blit(self.end_image, (0, self.end_rect.y))
+        # if self.start_rect.bottom >= 0 and self.start_rect.top <= 600:
+        #     self.image.blit(self.start_image, (0, self.start_rect.y))
+        # if height_difference > 0:
+        #     self.image.blit(self.hold_image, (WIDTH // LANES // 2 - self.hold_rect.w // 2,
+        #                                       self.end_rect.centery if height_difference > 0
+        #                                       else self.start_rect.centery))
+
+        # self.image.blit(self.start_image, (0, self.start_rect.y))
+        # self.image.blit(self.end_image, (0, self.end_rect.y))
+        pygame.draw.rect(self.image, NOTE_COLOR, self.start_rect)
+        pygame.draw.rect(self.image, NOTE_COLOR, self.end_rect)
         pygame.draw.rect(self.image, NOTE_COLOR, self.hold_rect)
-        self.image.blits([
-            (self.end_image, (0, self.end_rect.y)),
-            (self.start_image, (0, self.start_rect.y))
-        ])
 
     def judge(self, timing: int):
         if not self.is_held:

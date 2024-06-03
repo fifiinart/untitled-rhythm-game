@@ -64,8 +64,13 @@ judge.on_judge_event += [graphics.render_accuracy, graphics.render_combo]
 
 for i in range(8):
     note = Hold(i * 1000, i % 4, i * 1000 + 500, judge)
-    notes.add(note)
-    lanes[i % 4].add(note)
+    note2 = Note(i * 1000, (i+1) % 4, judge)
+    note3 = Note(i * 1000 + 500, (i + 1) % 4, judge)
+    # notes.add(note)
+    # lanes[i % 4].add(note)
+    for n in [note, note2, note3]:
+        notes.add(n)
+        lanes[n.lane].add(n)
 
 
 # # sort notes into lanes
