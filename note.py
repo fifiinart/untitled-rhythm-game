@@ -94,7 +94,6 @@ class Hold(pygame.sprite.Sprite):
             if self._judge.judge(timing - self.start_timing):
                 self.is_held = True
         else:
-            print("keyup")
             if self._judge.judge(timing - self.end_timing):
                 self.is_held = False
                 self.kill()

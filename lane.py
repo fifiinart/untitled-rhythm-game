@@ -18,8 +18,8 @@ class Lane(pygame.sprite.Group):
         if len(self.sprites()) > 0:
             note = self.sprites()[0]
 
-            should_judge_keydown = (isinstance(note, Note) or
-                                    (isinstance(note, Hold) and not note.is_held) and
+            should_judge_keydown = ((isinstance(note, Note) or
+                                    (isinstance(note, Hold) and not note.is_held)) and
                                     judge_type == pygame.KEYDOWN)
             should_judge_keyup = (isinstance(note, Hold) and
                                   note.is_held and

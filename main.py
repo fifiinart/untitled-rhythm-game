@@ -47,35 +47,19 @@ lanes: list[Lane] = [Lane(i) for i in range(LANES)]
 
 graphics = Graphics(notes)
 
-BPM = 120
-OFFSET = 56
+OFFSET = 125
 
 judge = Judge()
 
 judge.on_judge_event += [graphics.render_accuracy, graphics.render_combo]
-#
-# for x, time, type, end_time in beatmap["hit-objects"]:
-#     if type == 3:
-#         note = Hold(time, x * 4 // 512, end_time, judge)
-#     else:
-#         note = Note(time, x * 4 // 512, judge)
-#     notes.add(note)
-#     lanes[x * 4 // 512].add(note)
 
-for i in range(8):
-    note = Hold(i * 1000, i % 4, i * 1000 + 500, judge)
-    note2 = Note(i * 1000, (i+1) % 4, judge)
-    note3 = Note(i * 1000 + 500, (i + 1) % 4, judge)
-    # notes.add(note)
-    # lanes[i % 4].add(note)
-    for n in [note, note2, note3]:
-        notes.add(n)
-        lanes[n.lane].add(n)
-
-
-# # sort notes into lanes
-# for note in notes:
-#     lanes[note.lane].add(note)
+for x, time, type, end_time in beatmap["hit-objects"]:
+    if type == 3:
+        note = Hold(time + OFFSET, x * 4 // 512, end_time + OFFSET, judge)
+    else:
+        note = Note(time + OFFSET, x * 4 // 512, judge)
+    notes.add(note)
+    lanes[x * 4 // 512].add(note)
 
 hits = []
 wait_timer = 2000

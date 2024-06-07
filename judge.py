@@ -50,7 +50,6 @@ class Judge:
         [e(self, judgement) for e in self.on_judge_event]
 
     def judge(self, diff_timing: int):
-        print(diff_timing)
         if diff_timing > self.timings[Judge.Judge.MISS]:  # too far away to judge
             return False
         for judgement, window in self.timings.items():
